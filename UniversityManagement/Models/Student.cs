@@ -25,6 +25,7 @@ namespace UniversityManagement.Models
         public string FirstName { get; set; }
         public Nullable<System.DateTime> EnrollmentDate { get; set; }
         public string MiddleName { get; set; }
+        public Nullable<System.DateTime> DateOfBirth { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Enrollment> Enrollments { get; set; }

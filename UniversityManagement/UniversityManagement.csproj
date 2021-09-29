@@ -186,9 +186,11 @@
     </Compile>
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\CoursesMetaData.cs" />
     <Compile Include="Models\Student.cs">
       <DependentUpon>UniversityManagementDBModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\StudentMetaData.cs" />
     <Compile Include="Models\UniversityManagementDBModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
