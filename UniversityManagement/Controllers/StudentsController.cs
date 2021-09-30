@@ -11,11 +11,13 @@ using UniversityManagement.Models;
 
 namespace UniversityManagement.Controllers
 {
+    [Authorize]
     public class StudentsController : Controller
     {
         private UniversityManagementDBEntities db = new UniversityManagementDBEntities();
 
         // GET: Students
+        [AllowAnonymous]
         public async Task<ActionResult> Index()
         {
             return View(await db.Students.ToListAsync());

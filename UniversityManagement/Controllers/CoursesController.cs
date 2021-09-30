@@ -10,6 +10,7 @@ using UniversityManagement.Models;
 
 namespace UniversityManagement.Controllers
 {
+    [Authorize]
     public class CoursesController : Controller
     {
         private UniversityManagementDBEntities db = new UniversityManagementDBEntities();
