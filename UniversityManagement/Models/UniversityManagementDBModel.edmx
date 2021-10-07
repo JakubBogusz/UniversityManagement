@@ -21,6 +21,18 @@
           <Property Name="Grade" Type="decimal" Precision="3" Scale="2" />
           <Property Name="CourseID" Type="int" Nullable="false" />
           <Property Name="StudentID" Type="int" Nullable="false" />
+          <Property Name="LecturerId" Type="int" />
+        </EntityType>
+        <EntityType Name="Lecturers">
+          <Key>
+            <PropertyRef Name="LecturerID" />
+          </Key>
+          <Property Name="LecturerID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FirstName" Type="nvarchar" MaxLength="50" />
+          <Property Name="LastName" Type="nvarchar" MaxLength="50" />
+          <Property Name="MiddleName" Type="nvarchar" MaxLength="50" />
+          <Property Name="Specialization" Type="nvarchar" MaxLength="50" />
+          <Property Name="Email" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="Student">
           <Key>
@@ -47,6 +59,20 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_dbo_Enrollment_dbo_Lecturers_LecturersID">
+          <End Role="Lecturers" Type="Self.Lecturers" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Enrollment" Type="Self.Enrollment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Lecturers">
+              <PropertyRef Name="LecturerID" />
+            </Principal>
+            <Dependent Role="Enrollment">
+              <PropertyRef Name="LecturerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_dbo_Enrollment_dbo_Student_StudentID">
           <End Role="Student" Type="Self.Student" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -64,9 +90,14 @@
         <EntityContainer Name="UniversityManagementDBModelStoreContainer">
           <EntitySet Name="Course" EntityType="Self.Course" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Enrollment" EntityType="Self.Enrollment" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Lecturers" EntityType="Self.Lecturers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Student" EntityType="Self.Student" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_dbo_Enrollment_dbo_Course_CourseID" Association="Self.FK_dbo_Enrollment_dbo_Course_CourseID">
             <End Role="Course" EntitySet="Course" />
+            <End Role="Enrollment" EntitySet="Enrollment" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_Enrollment_dbo_Lecturers_LecturersID" Association="Self.FK_dbo_Enrollment_dbo_Lecturers_LecturersID">
+            <End Role="Lecturers" EntitySet="Lecturers" />
             <End Role="Enrollment" EntitySet="Enrollment" />
           </AssociationSet>
           <AssociationSet Name="FK_dbo_Enrollment_dbo_Student_StudentID" Association="Self.FK_dbo_Enrollment_dbo_Student_StudentID">
@@ -97,6 +128,8 @@
           <Property Name="StudentID" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Course" Relationship="Self.FK_dbo_Enrollment_dbo_Course_CourseID" FromRole="Enrollment" ToRole="Course" />
           <NavigationProperty Name="Student" Relationship="Self.FK_dbo_Enrollment_dbo_Student_StudentID" FromRole="Enrollment" ToRole="Student" />
+          <Property Name="LecturerId" Type="Int32" />
+          <NavigationProperty Name="Lecturer" Relationship="UniversityManagementDBModel.FK_dbo_Enrollment_dbo_Lecturers_LecturersID" FromRole="Enrollment" ToRole="Lecturer" />
         </EntityType>
         <EntityType Name="Student">
           <Key>
@@ -150,7 +183,38 @@
             <End Role="Student" EntitySet="Students" />
             <End Role="Enrollment" EntitySet="Enrollments" />
           </AssociationSet>
+          <EntitySet Name="Lecturers" EntityType="UniversityManagementDBModel.Lecturer" />
+          <AssociationSet Name="FK_dbo_Enrollment_dbo_Lecturers_LecturersID" Association="UniversityManagementDBModel.FK_dbo_Enrollment_dbo_Lecturers_LecturersID">
+            <End Role="Lecturer" EntitySet="Lecturers" />
+            <End Role="Enrollment" EntitySet="Enrollments" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="Lecturer">
+          <Key>
+            <PropertyRef Name="LecturerID" />
+          </Key>
+          <Property Name="LecturerID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FirstName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="LastName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="MiddleName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Specialization" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Enrollments" Relationship="UniversityManagementDBModel.FK_dbo_Enrollment_dbo_Lecturers_LecturersID" FromRole="Lecturer" ToRole="Enrollment" />
+        </EntityType>
+        <Association Name="FK_dbo_Enrollment_dbo_Lecturers_LecturersID">
+          <End Type="UniversityManagementDBModel.Lecturer" Role="Lecturer" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="UniversityManagementDBModel.Enrollment" Role="Enrollment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Lecturer">
+              <PropertyRef Name="LecturerID" />
+            </Principal>
+            <Dependent Role="Enrollment">
+              <PropertyRef Name="LecturerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -169,6 +233,7 @@
           <EntitySetMapping Name="Enrollments">
             <EntityTypeMapping TypeName="UniversityManagementDBModel.Enrollment">
               <MappingFragment StoreEntitySet="Enrollment">
+                <ScalarProperty Name="LecturerId" ColumnName="LecturerId" />
                 <ScalarProperty Name="EnrollmentID" ColumnName="EnrollmentID" />
                 <ScalarProperty Name="Grade" ColumnName="Grade" />
                 <ScalarProperty Name="CourseID" ColumnName="CourseID" />
@@ -185,6 +250,18 @@
                 <ScalarProperty Name="LastName" ColumnName="LastName" />
                 <ScalarProperty Name="FirstName" ColumnName="FirstName" />
                 <ScalarProperty Name="EnrollmentDate" ColumnName="EnrollmentDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Lecturers">
+            <EntityTypeMapping TypeName="UniversityManagementDBModel.Lecturer">
+              <MappingFragment StoreEntitySet="Lecturers">
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Specialization" ColumnName="Specialization" />
+                <ScalarProperty Name="MiddleName" ColumnName="MiddleName" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="LecturerID" ColumnName="LecturerID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
