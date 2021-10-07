@@ -11,7 +11,7 @@ using UniversityManagement.Models;
 
 namespace UniversityManagement.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin, Teacher")]
     public class StudentsController : Controller
     {
         private UniversityManagementDBEntities db = new UniversityManagementDBEntities();

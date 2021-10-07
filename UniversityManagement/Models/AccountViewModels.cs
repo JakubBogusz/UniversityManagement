@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 
 namespace UniversityManagement.Models
 {
@@ -50,10 +51,14 @@ namespace UniversityManagement.Models
 
     public class LoginViewModel
     {
+
         [Required]
-        [Display(Name = "Email Address / Username")]
-        [EmailAddress]
-        public string Email { get; set; }
+        [Display(Name = "Username")]
+        public string Username { get; set; }
+
+        //[Display(Name = "Email Address")]
+        //[EmailAddress]
+        //public string Email { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
