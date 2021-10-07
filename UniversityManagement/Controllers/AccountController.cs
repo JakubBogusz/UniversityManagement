@@ -17,9 +17,11 @@ namespace UniversityManagement.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private ApplicationDbContext _applicationDbContext;
 
         public AccountController()
         {
+            this._applicationDbContext = new ApplicationDbContext();
         }
 
         public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
@@ -139,6 +141,7 @@ namespace UniversityManagement.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
+            ViewBag.Roles = new SelectList(_applicationDbContext.Roles.Where(x => !x.Name.Contains("Admin")).ToList(), "Name", "Name");
             return View();
         }
 
@@ -151,7 +154,7 @@ namespace UniversityManagement.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, BirthDate = model.BirthDate};
+                var user = new ApplicationUser { UserName = model.Username, Email = model.Email, BirthDate = model.BirthDate};
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -163,8 +166,12 @@ namespace UniversityManagement.Controllers
                     // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                     // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
+                    await this.UserManager.AddToRoleAsync(user.Id, model.UserRole);
+
                     return RedirectToAction("Index", "Home");
                 }
+
+                ViewBag.Roles = new SelectList(_applicationDbContext.Roles.Where(x => !x.Name.Contains("Admin")).ToList(), "Name", "Name");
                 AddErrors(result);
             }
 
