@@ -6,10 +6,11 @@
 }
 
 <script>
-    $( function () {
-        $("#Student_FirstName" ).autocomplete({
-            source: function( request, response ) {
-                $.ajax( {
+
+    $(function () {
+        $("#Student_FirstName").autocomplete({
+            source: function (request, response) {
+                $.ajax({
                     url: "/Enrollments/GetStudents",
                     dataType: "json",
                     type: "POST",
@@ -18,38 +19,67 @@
                     },
                     success: function (data) {
                         console.log(data);
-                        response($.map(data, function(item) {
-                            return { label: item.Name, value: item.Name, id: item.ID };
-                        }));
+                        response($.map(data, function (item) {
+                            return { label: item.Name, value: item.Name, id: item.Id };
+                        }))
                     }
-                } );
+                });
             },
             minLength: 2,
-            select: function( event, query ) {
+            select: function (event, query) {
                 console.log(query);
-                $("#StudentId").val(query.item.id);
+                $("#StudentID").val(query.item.id);
             }
-        } );
-    } );
+        });
+    });
+
+    function Added(response) {
+        if (response.IsSuccess) {
+            $(function () {
+                $("#failed").fadeOut('fast');
+                $("#success").fadeIn('fast');
+                //$('#success').append(response.Message);
+            })
+        }
+        else {
+            Failed(response);
+        }
+    }
+
+    function Failed(response) {
+        $(function () {
+            $("#success").fadeOut('fast');
+            $("#failed").fadeIn('fast');
+        })
+    }
+
 </script>
-<h2>Create</h2>
+
+<h2>Enrollment</h2>
 
 @using (Ajax.BeginForm("AddStudent", "Enrollments", new AjaxOptions
 {
     HttpMethod = "POST",
     OnSuccess = "Added",
-    OnFailure = "Failed"
-})) 
+    OnFailure = "Failure"
+}))
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
-        <h4>Enrollment</h4>
+        <h4>Enroll student to courses.</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
+        <div id="failed" class="alert alert-danger" style="display: none;">
+            An Error occurred while adding student to the course.
+        </div>
+        <div id="success" class="alert alert-success" style="display: none;">
+            Student added Successfully!
+        </div>
+
         <div class="form-group">
-            @Html.LabelFor(model => model.CourseID, "CourseID", htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.CourseID, "Course Name", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.DropDownList("CourseID", null, htmlAttributes: new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.CourseID, "", new { @class = "text-danger" })
@@ -57,30 +87,32 @@
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.StudentID, "StudentID", htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.StudentID, "Student Name", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @*<input type="text" id="StudentName"/>*@
-                @Html.EditorFor(model => model.Student.FirstName, new { htmlAttributes = new { @class = "form-control" }})
+                @*<input type="text" id="StudentName" />*@
+                @Html.EditorFor(model => model.Student.FirstName, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.HiddenFor(model => model.StudentID)
-                @Html.ValidationMessageFor(model => model.StudentID, "", new {@class = "text-danger"})
+                @Html.ValidationMessageFor(model => model.StudentID, "", new { @class = "text-danger" })
             </div>
         </div>
 
         @*<div class="form-group">
-            @Html.LabelFor(model => model.LecturerId, "LecturerId", htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownList("LecturerId", null, htmlAttributes: new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.LecturerId, "", new { @class = "text-danger" })
-            </div>
-        </div>*@
+                @Html.LabelFor(model => model.LecturerId, "LecturerId", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownList("LecturerId", null, htmlAttributes: new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.LecturerId, "", new { @class = "text-danger" })
+                </div>
+            </div>*@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" value="Enroll" class="btn btn-default" />
             </div>
         </div>
     </div>
 }
+
+
 
 <div>
     @Html.ActionLink("Back to List", "Index")

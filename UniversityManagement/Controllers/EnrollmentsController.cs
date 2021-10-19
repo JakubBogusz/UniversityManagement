@@ -62,12 +62,12 @@ namespace UniversityManagement.Controllers
 
             ViewBag.CourseID = new SelectList(db.Courses, "CourseID", "Title", enrollment.CourseID);
             ViewBag.StudentID = new SelectList(db.Students, "StudentID", "LastName", enrollment.StudentID);
-            //ViewBag.LecturerId = new SelectList(db.Lecturers, "LecturerID", "FirstName", enrollment.LecturerId);
+            ViewBag.LecturerId = new SelectList(db.Lecturers, "LecturerID", "First_Name", enrollment.LecturerId);
             return View(enrollment);
         }
 
         [HttpPost]
-        public async Task<JsonResult> AddStudent([Bind(Include = "CourseID,StudentID")] Enrollment enrollment)
+        public async Task<JsonResult> AddStudent([Bind(Include = "CourseID, StudentID")] Enrollment enrollment)
         {
             try
             {
