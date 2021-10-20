@@ -191,6 +191,7 @@
     <Compile Include="Models\Enrollment.cs">
       <DependentUpon>UniversityManagementDBModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\EnrollmentMetaData.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Lecturer.cs">
       <DependentUpon>UniversityManagementDBModel.tt</DependentUpon>
@@ -366,6 +367,7 @@
     <Content Include="Views\Enrollments\Details.cshtml" />
     <Content Include="Views\Enrollments\Edit.cshtml" />
     <Content Include="Views\Enrollments\Index.cshtml" />
+    <Content Include="Views\Enrollments\_enrollmentsPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

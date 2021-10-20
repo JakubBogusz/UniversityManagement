@@ -13,13 +13,21 @@ namespace UniversityManagement.Controllers
 {
     public class EnrollmentsController : Controller
     {
-        private UniversityManagementDBEntities db = new UniversityManagementDBEntities();
+        private UniversityManagementDBEntities dbContext = new UniversityManagementDBEntities();
 
         // GET: Enrollments
         public async Task<ActionResult> Index()
         {
-            var enrollments = db.Enrollments.Include(e => e.Course).Include(e => e.Student).Include(e => e.Lecturer);
+            var enrollments = dbContext.Enrollments.Include(e => e.Course).Include(e => e.Student).Include(e => e.Lecturer);
             return View(await enrollments.ToListAsync());
+        }
+
+        public PartialViewResult _enrollmentsPartial(int? courseId)
+        {
+            var enrollmentsData = dbContext.Enrollments.Where(x => x.CourseID == courseId)
+                .Include(e => e.Course)
+                .Include(e => e.Student);
+            return PartialView(enrollmentsData.ToList());
         }
 
         // GET: Enrollments/Details/5
@@ -29,7 +37,7 @@ namespace UniversityManagement.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Enrollment enrollment = await db.Enrollments.FindAsync(id);
+            Enrollment enrollment = await dbContext.Enrollments.FindAsync(id);
             if (enrollment == null)
             {
                 return HttpNotFound();
@@ -40,9 +48,9 @@ namespace UniversityManagement.Controllers
         // GET: Enrollments/Create
         public ActionResult Create()
         {
-            ViewBag.CourseID = new SelectList(db.Courses, "CourseID", "Title");
-            ViewBag.StudentID = new SelectList(db.Students, "StudentID", "LastName");
-            ViewBag.LecturerId = new SelectList(db.Lecturers, "LecturerID", "FirstName");
+            ViewBag.CourseID = new SelectList(dbContext.Courses, "CourseID", "Title");
+            ViewBag.StudentID = new SelectList(dbContext.Students, "StudentID", "LastName");
+            ViewBag.LecturerId = new SelectList(dbContext.Lecturers, "LecturerID", "FirstName");
             return View();
         }
 
@@ -55,14 +63,14 @@ namespace UniversityManagement.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Enrollments.Add(enrollment);
-                await db.SaveChangesAsync();
+                dbContext.Enrollments.Add(enrollment);
+                await dbContext.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
 
-            ViewBag.CourseID = new SelectList(db.Courses, "CourseID", "Title", enrollment.CourseID);
-            ViewBag.StudentID = new SelectList(db.Students, "StudentID", "LastName", enrollment.StudentID);
-            ViewBag.LecturerId = new SelectList(db.Lecturers, "LecturerID", "First_Name", enrollment.LecturerId);
+            ViewBag.CourseID = new SelectList(dbContext.Courses, "CourseID", "Title", enrollment.CourseID);
+            ViewBag.StudentID = new SelectList(dbContext.Students, "StudentID", "LastName", enrollment.StudentID);
+            ViewBag.LecturerId = new SelectList(dbContext.Lecturers, "LecturerID", "First_Name", enrollment.LecturerId);
             return View(enrollment);
         }
 
@@ -71,13 +79,13 @@ namespace UniversityManagement.Controllers
         {
             try
             {
-                var isEnrolled = db.Enrollments.Any(q => q.CourseID == enrollment.CourseID && q.StudentID == enrollment.StudentID);
+                var isEnrolled = dbContext.Enrollments.Any(q => q.CourseID == enrollment.CourseID && q.StudentID == enrollment.StudentID);
                 if (!isEnrolled)
                 {
                     if (ModelState.IsValid)
                     {
-                        db.Enrollments.Add(enrollment);
-                        await db.SaveChangesAsync();
+                        dbContext.Enrollments.Add(enrollment);
+                        await dbContext.SaveChangesAsync();
                         return Json(new { IsSuccess = true, Message = "Students added successfully." }, JsonRequestBehavior.AllowGet);
                     }
                     return Json(new { IsSuccess = false, Message = "Provided data is wrong." }, JsonRequestBehavior.AllowGet);
@@ -97,14 +105,14 @@ namespace UniversityManagement.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Enrollment enrollment = await db.Enrollments.FindAsync(id);
+            Enrollment enrollment = await dbContext.Enrollments.FindAsync(id);
             if (enrollment == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.CourseID = new SelectList(db.Courses, "CourseID", "Title", enrollment.CourseID);
-            ViewBag.StudentID = new SelectList(db.Students, "StudentID", "LastName", enrollment.StudentID);
-            ViewBag.LecturerId = new SelectList(db.Lecturers, "LecturerID", "FirstName", enrollment.LecturerId);
+            ViewBag.CourseID = new SelectList(dbContext.Courses, "CourseID", "Title", enrollment.CourseID);
+            ViewBag.StudentID = new SelectList(dbContext.Students, "StudentID", "LastName", enrollment.StudentID);
+            ViewBag.LecturerId = new SelectList(dbContext.Lecturers, "LecturerID", "FirstName", enrollment.LecturerId);
             return View(enrollment);
         }
 
@@ -117,13 +125,13 @@ namespace UniversityManagement.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(enrollment).State = EntityState.Modified;
-                await db.SaveChangesAsync();
+                dbContext.Entry(enrollment).State = EntityState.Modified;
+                await dbContext.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            ViewBag.CourseID = new SelectList(db.Courses, "CourseID", "Title", enrollment.CourseID);
-            ViewBag.StudentID = new SelectList(db.Students, "StudentID", "LastName", enrollment.StudentID);
-            ViewBag.LecturerId = new SelectList(db.Lecturers, "LecturerID", "FirstName", enrollment.LecturerId);
+            ViewBag.CourseID = new SelectList(dbContext.Courses, "CourseID", "Title", enrollment.CourseID);
+            ViewBag.StudentID = new SelectList(dbContext.Students, "StudentID", "LastName", enrollment.StudentID);
+            ViewBag.LecturerId = new SelectList(dbContext.Lecturers, "LecturerID", "FirstName", enrollment.LecturerId);
             return View(enrollment);
         }
 
@@ -134,7 +142,7 @@ namespace UniversityManagement.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Enrollment enrollment = await db.Enrollments.FindAsync(id);
+            Enrollment enrollment = await dbContext.Enrollments.FindAsync(id);
             if (enrollment == null)
             {
                 return HttpNotFound();
@@ -147,16 +155,16 @@ namespace UniversityManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Enrollment enrollment = await db.Enrollments.FindAsync(id);
-            db.Enrollments.Remove(enrollment);
-            await db.SaveChangesAsync();
+            Enrollment enrollment = await dbContext.Enrollments.FindAsync(id);
+            dbContext.Enrollments.Remove(enrollment);
+            await dbContext.SaveChangesAsync();
             return RedirectToAction("Index");
         }
 
         [HttpPost]
         public JsonResult GetStudents(string term)
         {
-            var students = db.Students.Select(x => new
+            var students = dbContext.Students.Select(x => new
             {
                 Name = x.FirstName + " " + x.LastName,
                 Id = x.StudentID
@@ -169,7 +177,7 @@ namespace UniversityManagement.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                dbContext.Dispose();
             }
             base.Dispose(disposing);
         }
